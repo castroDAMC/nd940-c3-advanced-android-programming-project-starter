@@ -42,51 +42,9 @@ class MainActivity : AppCompatActivity() {
 
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
-//        configureNotification()
-
         custom_button.setOnClickListener {
             download()
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-//    fun configureNotification(downloadStatus: String, downloadOption: String) {
-    fun configureNotification() {
-
-        //Intent
-        notifyIntent = Intent(applicationContext, DetailActivity::class.java)
-        notifyIntent.putExtra("TESTE", "EXTRA_SUCCESS")
-
-        //Creating a PendingIntent
-        resultPending = PendingIntent.getActivity(
-            applicationContext,
-            NOTIFICATION_ID,
-            notifyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        // NotificationManager
-        notificationManager = this.getSystemService(NotificationManager::class.java)
-
-        // NotificationChannel
-        val notificationChannel = NotificationChannel(
-            CHANNEL_ID,
-            "Resource Download Notification",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
-        notificationChannel.enableVibration(true)
-        notificationChannel.description = "Notify when download is finished"
-
-        // Build Notification
-        builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setContentTitle(applicationContext.getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_description))
-            .setSmallIcon(R.drawable.ic_assistant_black_24dp)
-            .setContentIntent(resultPending)
-            .setAutoCancel(true)
-
-        // Set NotificationChannel into NotificationManager
-        notificationManager.createNotificationChannel(notificationChannel)
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -100,14 +58,14 @@ class MainActivity : AppCompatActivity() {
             val cursor: Cursor = manager.query(query)
             if (cursor.moveToFirst()) {
                 if (cursor.count > 0) {
-                    val status: Int =
+                    val downloadStatus: Int =
                         cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
 
-                    val statusString :String = when(status){
+                    val statusFeedback :String = when(downloadStatus){
                         DownloadManager.STATUS_SUCCESSFUL -> "Download Finished"
                         else -> "Fail"
                     }
-                    sendNotification(statusString, btnSelected)
+                    sendNotification(statusFeedback, btnSelected)
                 }
             }
 
@@ -122,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         //Intent
         notifyIntent = Intent(applicationContext, DetailActivity::class.java)
         notifyIntent.putExtra("DOWNLOAD_VIA", downloadVia)
-        notifyIntent.putExtra("DOWNLOAD_STATUS", "downloadStatus")
+        notifyIntent.putExtra("DOWNLOAD_STATUS", downloadStatus)
 
         //Creating a PendingIntent
         resultPending = PendingIntent.getActivity(
@@ -131,9 +89,6 @@ class MainActivity : AppCompatActivity() {
             notifyIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
-
-        // NotificationManager
-        notificationManager = this.getSystemService(NotificationManager::class.java)
 
         // NotificationChannel
         val notificationChannel = NotificationChannel(
@@ -151,8 +106,10 @@ class MainActivity : AppCompatActivity() {
             .setSmallIcon(R.drawable.ic_assistant_black_24dp)
             .setContentIntent(resultPending)
             .setAutoCancel(true)
+            .addAction(R.drawable.ic_launcher_foreground, "Check Status", resultPending)
 
         // Set NotificationChannel into NotificationManager
+        notificationManager = this.getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(notificationChannel)
     }
 
