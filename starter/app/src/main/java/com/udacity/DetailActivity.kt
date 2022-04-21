@@ -1,12 +1,12 @@
 package com.udacity
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_detail.*
-import org.w3c.dom.Text
+
 
 class DetailActivity : AppCompatActivity() {
 
@@ -15,14 +15,17 @@ class DetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
 
-        val txt1: TextView = findViewById(R.id.textView)
-        val txt2: TextView = findViewById(R.id.textView2)
+        (findViewById<TextView>(R.id.txt_name_body)).text = intent.getStringExtra("DOWNLOAD_VIA").toString()
+        (findViewById<TextView>(R.id.txt_status_body)).text = intent.getStringExtra("DOWNLOAD_STATUS").toString()
 
-        txt1.text = intent.getStringExtra("DOWNLOAD_STATUS").toString()
-        txt2.text = intent.getStringExtra("DOWNLOAD_VIA").toString()
-
-        Log.d("TEST_DOWNLOAD_STATUS", intent.getStringExtra("DOWNLOAD_STATUS").toString())
-        Log.d("TEST_DOWNLOAD_VIA", intent.getStringExtra("DOWNLOAD_VIA").toString())
+        (findViewById<Button>(R.id.btn_back_home)).setOnClickListener {
+            when (!isTaskRoot) {
+                true -> super.onBackPressed()
+                false -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                }
+            }
+        }
     }
 
 }

@@ -9,22 +9,56 @@
     tools:showIn="@layout/activity_detail">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:id="@+id/txt_name_title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="26dp"
-        android:layout_marginTop="38dp"
-        android:text="TextView"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/txt_title_file_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/txt_default_detail_title" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/txt_status_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="23dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        android:text="@string/txt_title_status"
+        app:layout_constraintBaseline_toBaselineOf="@+id/txt_status_body"
+        app:layout_constraintStart_toStartOf="@+id/txt_name_title"
+        style="@style/txt_default_detail_title"/>
+
+    <TextView
+        android:id="@+id/txt_name_body"
+        style="@style/txt_default_detail_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/txt_name_title"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/download_using_glide" />
+
+    <TextView
+        android:id="@+id/txt_status_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        tools:text="Fail"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="@+id/txt_name_body"
+        app:layout_constraintStart_toStartOf="@+id/txt_name_body"
+        app:layout_constraintTop_toBottomOf="@+id/txt_name_body"
+        style="@style/txt_default_detail_body"/>
+
+    <Button
+        android:id="@+id/btn_back_home"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/btn_back_to_home"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txt_status_body"
+        app:layout_constraintStart_toStartOf="@+id/txt_status_title" />
 </androidx.constraintlayout.widget.ConstraintLayout>
