@@ -18,14 +18,16 @@ class DetailActivity : AppCompatActivity() {
         (findViewById<TextView>(R.id.txt_name_body)).text = intent.getStringExtra("DOWNLOAD_VIA").toString()
         (findViewById<TextView>(R.id.txt_status_body)).text = intent.getStringExtra("DOWNLOAD_STATUS").toString()
 
-//        (findViewById<Button>(R.id.btn_back_home)).setOnClickListener {
-//            when (!isTaskRoot) {
-//                true -> super.onBackPressed()
-//                false -> {
-//                    startActivity(Intent(this, MainActivity::class.java))
-//                }
-//            }
-//        }
+
+
+        (findViewById<Button>(R.id.btn_back_home)).setOnClickListener {
+            when (!isTaskRoot) {
+                true -> super.onBackPressed()
+                false -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                }
+            }
+        }
     }
 
 }

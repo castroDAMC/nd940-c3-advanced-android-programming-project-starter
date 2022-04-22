@@ -7,28 +7,51 @@
         motion:constraintSetEnd="@+id/end"
         motion:constraintSetStart="@id/start"
         motion:duration="1000">
-       <KeyFrameSet>
-       </KeyFrameSet>
         <OnClick motion:targetId="@id/btn_back_home" />
     </Transition>
 
     <ConstraintSet android:id="@+id/start"></ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
-        <Constraint
-            android:id="@+id/txt_name_title"
-            android:visibility="invisible" />
-        <Constraint
-            android:id="@+id/txt_status_title"
-            android:visibility="invisible" />
+
+
         <Constraint
             android:id="@+id/txt_name_body"
-            android:visibility="invisible" />
+            motion:layout_constraintBaseline_toBaselineOf="@+id/txt_name_title"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_editor_absoluteX="136dp"
+            android:layout_marginStart="20dp" />
         <Constraint
+            motion:layout_constraintBaseline_toBaselineOf="@+id/txt_name_title"
+            android:id="@+id/txt_status_title"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_editor_absoluteX="20dp"
+            android:layout_marginStart="20dp" />
+        <Constraint
+            motion:layout_constraintBaseline_toBaselineOf="@+id/txt_name_title"
             android:id="@+id/txt_status_body"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_editor_absoluteX="136dp"
+            android:layout_marginStart="20dp" />
+
+        <Constraint
+            android:id="@+id/txt_name_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="20dp"
             android:visibility="invisible" />
+
         <Constraint
             android:id="@+id/btn_back_home"
-            android:visibility="invisible" />
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="20dp"
+            motion:layout_constraintStart_toStartOf="@+id/txt_status_title"
+            android:layout_marginEnd="20dp" />
     </ConstraintSet>
 </MotionScene>
