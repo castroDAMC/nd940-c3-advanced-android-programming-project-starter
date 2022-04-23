@@ -43,6 +43,28 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
+
+            val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+
+            when (radioGroup.checkedRadioButtonId) {
+                R.id.rbtn_glide -> {
+                    URL = GLIDE_URL
+                    btnSelected = this.getString(R.string.download_using_glide)
+                }
+                R.id.rbtn_loadapp -> {
+                    URL = LOAD_APP_URL
+                    btnSelected = this.getString(R.string.download_using_loadapp)
+                }
+                R.id.rbtn_retrofit -> {
+                    URL = RETROFIT_URL
+                    btnSelected = this.getString(R.string.download_using_refrofit)
+                }
+                else -> {
+                    Toast.makeText(this, getString(R.string.rbtn_null_toast), Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+            custom_button.buttonState = ButtonState.Loading
             download()
         }
     }
@@ -65,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                         DownloadManager.STATUS_SUCCESSFUL -> "Download Finished"
                         else -> "Fail"
                     }
+                    custom_button.buttonState = ButtonState.Completed
                     sendNotification(statusFeedback, btnSelected)
                 }
             }
@@ -114,29 +137,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun download() {
-
-        val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
-
-        when (radioGroup.checkedRadioButtonId) {
-            R.id.rbtn_glide -> {
-                URL = GLIDE_URL
-                btnSelected = this.getString(R.string.download_using_glide)
-            }
-            R.id.rbtn_loadapp -> {
-                URL = LOAD_APP_URL
-                btnSelected = this.getString(R.string.download_using_loadapp)
-            }
-            R.id.rbtn_retrofit -> {
-                URL = RETROFIT_URL
-                btnSelected = this.getString(R.string.download_using_refrofit)
-            }
-            else -> EMPTY_URL
-        }
-
-        if (URL == EMPTY_URL) {
-            Toast.makeText(this, getString(R.string.rbtn_null_toast), Toast.LENGTH_SHORT).show()
-            return
-        }
 
         val request =
             DownloadManager.Request(Uri.parse(URL))
