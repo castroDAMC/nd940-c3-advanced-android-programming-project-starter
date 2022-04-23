@@ -9,7 +9,7 @@
     <string name="notification_button">See changes</string>
 
     <string name="button_name">Click me</string>
-    <string name="button_loading">We are loading </string>
+    <string name="button_loading">Downloading</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="download_using_glide">Glide - Image Loading Library by BumpTech</string>
     <string name="download_using_loadapp">LoadApp - Current repository by Udacity</string>
@@ -20,4 +20,5 @@
     <string name="txt_title_status">Status:</string>
     <string name="btn_back_to_home">Back to Home</string>
     <string name="generic_image_description">Generic Image</string>
+    <string name="btn_idle_status_text">Click to Download</string>
 </resources>

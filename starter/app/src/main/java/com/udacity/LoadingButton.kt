@@ -21,7 +21,7 @@ class LoadingButton @JvmOverloads constructor(
     private val valueAnimator: ValueAnimator = ValueAnimator.ofInt(0, 360).setDuration(2000)
 
     private var buttonTextStr = "Download"
-    private var progress = 360
+    private var progress = 0
 
     private val txtStyleSize = 50.0f
 
@@ -35,18 +35,17 @@ class LoadingButton @JvmOverloads constructor(
 
     var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
         when (new) {
+            ButtonState.Idle -> {
+                buttonTextStr = resources.getString(R.string.btn_idle_status_text)
+            }
             ButtonState.Loading -> {
                 buttonTextStr = resources.getString(R.string.button_loading)
-
                 valueAnimator.start()
-
             }
             ButtonState.Completed -> {
-                buttonTextStr = "Download it NOW!"
-//                buttonTextStr = resources.getString(R.string.button_name)
-                valueAnimator.cancel()
-
                 progress = 0
+                valueAnimator.cancel()
+                buttonState = ButtonState.Idle
             }
         }
 
@@ -55,7 +54,7 @@ class LoadingButton @JvmOverloads constructor(
 
 
     init {
-        buttonState = ButtonState.Completed
+        buttonState = ButtonState.Idle
 
         // setup animation
         valueAnimator.apply {
@@ -76,14 +75,6 @@ class LoadingButton @JvmOverloads constructor(
         paint.color = buttonBackgroundColor
         canvas?.drawRect(0f,0f,widthSize.toFloat(), heightSize.toFloat(), paint)
 
-        paint.color = buttonTextColor
-        var lineSize = (heightSize)/2.0f
-        canvas?.drawLine(0f, lineSize, widthSize.toFloat(), lineSize, paint )
-        lineSize = ((heightSize)/2.0f) + (txtStyleSize/2.0f)
-        canvas?.drawLine(0f, lineSize, widthSize.toFloat(), lineSize, paint )
-        lineSize = ((heightSize)/2.0f) - (txtStyleSize/2.0f)
-        canvas?.drawLine(0f, lineSize, widthSize.toFloat(), lineSize, paint )
-
         // text
         paint.color = buttonTextColor
         val textPosition = ((heightSize)/2.0f) - ((paint.descent() + paint.ascent())/2.0f)
@@ -98,7 +89,6 @@ class LoadingButton @JvmOverloads constructor(
         rect.top = ((heightSize)/2.0f) - (txtStyleSize/2.0f)
         rect.bottom = ((heightSize)/2.0f) + (txtStyleSize/2.0f)
 
-//        canvas?.drawRect(rect, paint)
         canvas?.drawArc(rect, 0f, progress.toFloat(), true, paint)
 
     }
