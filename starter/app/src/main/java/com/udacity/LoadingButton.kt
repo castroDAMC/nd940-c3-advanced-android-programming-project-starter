@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -18,8 +19,6 @@ class LoadingButton @JvmOverloads constructor(
 
     private var widthSize = 0
     private var heightSize = 0
-
-    private var rectangle : RectF
 
     private var buttonBackgroundColor = resources.getColor(android.R.color.holo_purple)
     private var buttonTextColor = resources.getColor(android.R.color.white)
@@ -61,7 +60,7 @@ class LoadingButton @JvmOverloads constructor(
                 valueAnimator.start()
             }
             ButtonState.Completed -> {
-                Log.d("ButtonState", " Completed")
+                buttonTextStr = "Finishing Download"
                 valueAnimator.repeatCount = 0
             }
             else -> {}
@@ -84,13 +83,6 @@ class LoadingButton @JvmOverloads constructor(
 
     init {
         buttonState = ButtonState.Idle
-
-        rectangle = RectF(
-            widthSize - 10.0f - paint.textSize * 2,
-            ((heightSize) / 2.0f) - (txtStyleSize),
-            widthSize - 10.0f,
-            ((heightSize) / 2.0f) + (txtStyleSize)
-        )
 
         initAnimationParameters()
         // setup animation
@@ -122,13 +114,13 @@ class LoadingButton @JvmOverloads constructor(
         // Download Progress
         paint.color = buttonCircleColor
 
-//        val rect = RectF()
-//        rect.right = widthSize - 10.0f
-//        rect.left = widthSize - 10.0f - paint.textSize*2
-//        rect.top = ((heightSize)/2.0f) - (txtStyleSize)
-//        rect.bottom = ((heightSize)/2.0f) + (txtStyleSize)
+        val rect = RectF()
+        rect.right = widthSize - 10.0f
+        rect.left = widthSize - 10.0f - paint.textSize*2
+        rect.top = ((heightSize)/2.0f) - (txtStyleSize)
+        rect.bottom = ((heightSize)/2.0f) + (txtStyleSize)
 
-        canvas?.drawArc(rectangle,0f, progress.toFloat(), true, paint
+        canvas?.drawArc(rect,0f, progress.toFloat(), true, paint
         )
 
     }
