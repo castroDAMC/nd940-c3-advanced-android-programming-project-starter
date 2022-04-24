@@ -19,9 +19,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
+
+    val applicationScope = CoroutineScope(Dispatchers.Default)
 
     private var downloadID: Long = 0
 
@@ -30,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var notifyIntent: Intent
     private lateinit var resultPending: PendingIntent
 
-    var URL: String = EMPTY_URL
+    private var URL: String = EMPTY_URL
     lateinit var btnSelected: String
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -59,7 +65,8 @@ class MainActivity : AppCompatActivity() {
                     btnSelected = this.getString(R.string.download_using_refrofit)
                 }
                 else -> {
-                    Toast.makeText(this, getString(R.string.rbtn_null_toast), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.rbtn_null_toast), Toast.LENGTH_SHORT)
+                        .show()
                     return@setOnClickListener
                 }
             }
@@ -82,16 +89,19 @@ class MainActivity : AppCompatActivity() {
                     val downloadStatus: Int =
                         cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
 
-                    val statusFeedback :String = when(downloadStatus){
+                    val statusFeedback: String = when (downloadStatus) {
                         DownloadManager.STATUS_SUCCESSFUL -> "Download Finished"
                         else -> "Fail"
                     }
-                    custom_button.buttonState = ButtonState.Completed
                     sendNotification(statusFeedback, btnSelected)
                 }
             }
+            applicationScope.launch {
+                delay(custom_button.timeToFinishDownloadAnimation() - custom_button.timeToEachStepInDownloadAnimation()*10)
+                custom_button.buttonState = ButtonState.Completed
+                notificationManager.notify(NOTIFICATION_ID, builder.build())
+            }
 
-            notificationManager.notify(NOTIFICATION_ID, builder.build())
         }
     }
 
@@ -107,7 +117,7 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             NOTIFICATION_ID,
             notifyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // NotificationChannel
