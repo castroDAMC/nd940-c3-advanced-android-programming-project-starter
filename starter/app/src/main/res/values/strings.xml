@@ -10,6 +10,9 @@
 
     <string name="button_name">Click me</string>
     <string name="button_loading">Downloading</string>
+    <string name="button_loading_120">Downloading.</string>
+    <string name="button_loading_240">Downloading..</string>
+    <string name="button_loading_350">Downloading...</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="download_using_glide">Glide - Image Loading Library by BumpTech</string>
     <string name="download_using_loadapp">LoadApp - Current repository by Udacity</string>

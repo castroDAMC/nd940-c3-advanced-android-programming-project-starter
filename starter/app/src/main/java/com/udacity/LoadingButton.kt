@@ -7,9 +7,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -60,7 +58,6 @@ class LoadingButton @JvmOverloads constructor(
                 valueAnimator.start()
             }
             ButtonState.Completed -> {
-                buttonTextStr = "Finishing Download"
                 valueAnimator.repeatCount = 0
             }
             else -> {}
@@ -90,6 +87,23 @@ class LoadingButton @JvmOverloads constructor(
             addUpdateListener {
                 progress = it.animatedValue as Int
                 invalidate()
+                when(progress){
+
+                    360 ->{
+                        buttonTextStr = resources.getString(R.string.button_loading)
+                    }
+
+                    120 -> {
+                        buttonTextStr = resources.getString(R.string.button_loading_120)
+                    }
+                    240 -> {
+                        buttonTextStr = resources.getString(R.string.button_loading_240)
+                    }
+                    330 -> {
+                        buttonTextStr = resources.getString(R.string.button_loading_350)
+                    }
+                }
+
                 if (buttonState == ButtonState.Completed && (progress == 360)) {
                     buttonState = ButtonState.Idle
                     progress = 0
