@@ -13,7 +13,9 @@ import kotlin.properties.Delegates
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
     private val defaultDuration: Long = 5000
+    private val downloadFinishedDuration: Long = 500
 
     private var widthSize = 0
     private var heightSize = 0
@@ -24,6 +26,8 @@ class LoadingButton @JvmOverloads constructor(
 
     private val valueAnimator: ValueAnimator =
         ValueAnimator.ofInt(0, 360).setDuration(defaultDuration)
+
+    private lateinit var valueAnimatorWhenFinished: ValueAnimator
 
     private var buttonTextStr = "Download"
     private var progress = 0
@@ -37,20 +41,9 @@ class LoadingButton @JvmOverloads constructor(
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
-    fun timeToFinishDownloadAnimation(): Long {
-        val stepTime = valueAnimator.duration.toFloat() / (360).toFloat()
-        val timeToFinish = stepTime * (360.0 - progress.toFloat())
-        return timeToFinish.toLong()
-    }
-
-    fun timeToEachStepInDownloadAnimation(): Long {
-        return (valueAnimator.duration.toFloat() / (360).toFloat()).toLong()
-    }
-
     var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
         when (new) {
             ButtonState.Idle -> {
-                initAnimationParameters()
                 buttonTextStr = resources.getString(R.string.btn_idle_status_text)
             }
             ButtonState.Loading -> {
@@ -58,53 +51,65 @@ class LoadingButton @JvmOverloads constructor(
                 valueAnimator.start()
             }
             ButtonState.Completed -> {
-                valueAnimator.repeatCount = 0
+                valueAnimator.cancel()
+                setupAnimatorWhenFinished()
+                valueAnimatorWhenFinished.start()
             }
             else -> {}
         }
-
-        invalidate()
     }
 
-    private fun initAnimationParameters() {
-        progress = 0
+    private fun setupAnimatorWhenFinished() {
+
+        valueAnimatorWhenFinished =
+            ValueAnimator.ofInt(progress, 360).setDuration(downloadFinishedDuration)
+
+        valueAnimatorWhenFinished.apply {
+            setIntValues(progress, 360)
+            repeatCount = 0
+            repeatMode = ValueAnimator.RESTART
+
+            addUpdateListener {
+                animateBasedOnProgress(it)
+            }
+        }
+    }
+
+
+    init {
+        buttonState = ButtonState.Idle
+
+        // setup animation
         valueAnimator.apply {
             setIntValues(progress, 360)
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.RESTART
             duration = defaultDuration
             cancel()
-
+            addUpdateListener {
+                animateBasedOnProgress(it)
+            }
         }
     }
 
-    init {
-        buttonState = ButtonState.Idle
-
-        initAnimationParameters()
-        // setup animation
-        valueAnimator.apply {
-            addUpdateListener {
-                progress = it.animatedValue as Int
-                invalidate()
-                when(progress){
-
-                    360 ->{
-                        buttonTextStr = resources.getString(R.string.button_loading)
-                    }
-
-                    120 -> {
-                        buttonTextStr = resources.getString(R.string.button_loading_120)
-                    }
-                    240 -> {
-                        buttonTextStr = resources.getString(R.string.button_loading_240)
-                    }
-                    330 -> {
-                        buttonTextStr = resources.getString(R.string.button_loading_350)
-                    }
-                }
-
-                if (buttonState == ButtonState.Completed && (progress == 360)) {
+    private fun animateBasedOnProgress(valueAnimator: ValueAnimator){
+        invalidate()
+        progress = valueAnimator.animatedValue as Int
+        when (progress) {
+            in 0..119 -> {
+                buttonTextStr = resources.getString(R.string.button_loading)
+            }
+            in 120..239 -> {
+                buttonTextStr = resources.getString(R.string.button_loading_120)
+            }
+            in 120..329 -> {
+                buttonTextStr = resources.getString(R.string.button_loading_240)
+            }
+            in 330..359 -> {
+                buttonTextStr = resources.getString(R.string.button_loading_350)
+            }
+            360 -> {
+                if (buttonState == ButtonState.Completed) {
                     buttonState = ButtonState.Idle
                     progress = 0
                 }

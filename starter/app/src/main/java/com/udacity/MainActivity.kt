@@ -19,15 +19,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
-
-    val applicationScope = CoroutineScope(Dispatchers.Default)
 
     private var downloadID: Long = 0
 
@@ -94,12 +88,9 @@ class MainActivity : AppCompatActivity() {
                         else -> "Fail"
                     }
                     sendNotification(statusFeedback, btnSelected)
+                    custom_button.buttonState = ButtonState.Completed
+                    notificationManager.notify(NOTIFICATION_ID, builder.build())
                 }
-            }
-            applicationScope.launch {
-                delay(custom_button.timeToFinishDownloadAnimation() - custom_button.timeToEachStepInDownloadAnimation()*10)
-                custom_button.buttonState = ButtonState.Completed
-                notificationManager.notify(NOTIFICATION_ID, builder.build())
             }
 
         }
