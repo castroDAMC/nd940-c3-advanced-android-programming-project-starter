@@ -2,14 +2,14 @@ package com.udacity
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.Typeface
+import android.graphics.*
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.RequiresApi
 import kotlin.properties.Delegates
 
+@RequiresApi(Build.VERSION_CODES.O)
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
@@ -20,34 +20,31 @@ class LoadingButton @JvmOverloads constructor(
     private var widthSize = 0
     private var heightSize = 0
 
-    private var buttonBackgroundColor = resources.getColor(android.R.color.holo_purple)
-    private var buttonTextColor = resources.getColor(android.R.color.white)
-    private var buttonCircleColor = resources.getColor(R.color.colorPrimaryDark)
-
     private val valueAnimator: ValueAnimator =
         ValueAnimator.ofInt(0, 360).setDuration(defaultDuration)
 
     private lateinit var valueAnimatorWhenFinished: ValueAnimator
 
-    private var buttonTextStr = "Download"
+    //Values will be load from attrs.xml. They are exposed to be changed in any layout .xml file
+    private lateinit var showIdleText: String
+    private lateinit var showLoadingText: String
+    private var buttonBackgroundColor : Int = 0
+    private var buttonTextColor: Int = 0
+    private var buttonCircleColor: Int = 0
+    private var txtStyleSize: Float = 0.0f
+
+    private lateinit var buttonTextStr : String
     private var progress = 0
 
-    private val txtStyleSize = 50.0f
-
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = txtStyleSize
-        typeface = Typeface.create("", Typeface.BOLD)
-    }
+    private lateinit var paint: Paint
 
     var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
         when (new) {
             ButtonState.Idle -> {
-                buttonTextStr = resources.getString(R.string.btn_idle_status_text)
+                buttonTextStr = showIdleText
             }
             ButtonState.Loading -> {
-                buttonTextStr = resources.getString(R.string.button_loading)
+                buttonTextStr = showLoadingText
                 valueAnimator.start()
             }
             ButtonState.Completed -> {
@@ -56,6 +53,27 @@ class LoadingButton @JvmOverloads constructor(
                 valueAnimatorWhenFinished.start()
             }
             else -> {}
+        }
+    }
+
+    init {
+        getValuesFromStyleable(attrs)
+        initPaint()
+        setUpAnimatorWhenDownloading()
+        buttonState = ButtonState.Idle
+    }
+
+    private fun setUpAnimatorWhenDownloading() {
+        // setup animation
+        valueAnimator.apply {
+            setIntValues(progress, 360)
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.RESTART
+            duration = defaultDuration
+            cancel()
+            addUpdateListener {
+                animateBasedOnProgress(it)
+            }
         }
     }
 
@@ -75,20 +93,34 @@ class LoadingButton @JvmOverloads constructor(
         }
     }
 
+    private fun getValuesFromStyleable(attrs: AttributeSet?) {
+        // Based on https://developer.android.com/training/custom-views/create-view
+        context.theme.obtainStyledAttributes(attrs, R.styleable.LoadingButton, 0, 0).apply {
+            try {
+                //Get Text
+                showIdleText = getString(R.styleable.LoadingButton_customShowIdleText).toString()
+                showLoadingText = getString(R.styleable.LoadingButton_customShowLoadingText).toString()
 
-    init {
-        buttonState = ButtonState.Idle
+                //Get Color
+                buttonBackgroundColor = getColor(R.styleable.LoadingButton_customBackgroundColor,resources.getColor(android.R.color.holo_purple, null))
+                buttonTextColor = getColor(R.styleable.LoadingButton_customShowTextColor,resources.getColor(android.R.color.white, null))
+                buttonCircleColor = getColor(R.styleable.LoadingButton_customShowCircleColor,resources.getColor(R.color.colorPrimary, null))
 
-        // setup animation
-        valueAnimator.apply {
-            setIntValues(progress, 360)
-            repeatCount = ValueAnimator.INFINITE
-            repeatMode = ValueAnimator.RESTART
-            duration = defaultDuration
-            cancel()
-            addUpdateListener {
-                animateBasedOnProgress(it)
+                //Get Dimension
+                txtStyleSize = getDimension(R.styleable.LoadingButton_customShowTxtSize, 25.0f)
+
+            } finally {
+                recycle()
             }
+        }
+    }
+
+    private fun initPaint() {
+        paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+            textAlign = Paint.Align.CENTER
+            textSize = txtStyleSize
+            typeface = Typeface.create("", Typeface.BOLD)
         }
     }
 
@@ -97,7 +129,7 @@ class LoadingButton @JvmOverloads constructor(
         progress = valueAnimator.animatedValue as Int
         when (progress) {
             in 0..119 -> {
-                buttonTextStr = resources.getString(R.string.button_loading)
+                buttonTextStr = showLoadingText
             }
             in 120..239 -> {
                 buttonTextStr = resources.getString(R.string.button_loading_120)
@@ -122,24 +154,22 @@ class LoadingButton @JvmOverloads constructor(
         super.onDraw(canvas)
 
         // BackGround
-        paint.color = buttonBackgroundColor
-        canvas?.drawRect(0f, 0f, widthSize.toFloat(), heightSize.toFloat(), paint)
+        canvas?.drawRect(0f, 0f, widthSize.toFloat(), heightSize.toFloat(), paint.apply { color = buttonBackgroundColor })
 
         // text
-        paint.color = buttonTextColor
         val textPosition = ((heightSize) / 2.0f) - ((paint.descent() + paint.ascent()) / 2.0f)
-        canvas?.drawText(buttonTextStr, widthSize / 2.0f, textPosition, paint)
+        canvas?.drawText(buttonTextStr, widthSize / 2.0f, textPosition, paint.apply { color = buttonTextColor })
 
         // Download Progress
         paint.color = buttonCircleColor
 
         val rect = RectF()
         rect.right = widthSize - 10.0f
-        rect.left = widthSize - 10.0f - paint.textSize*2
+        rect.left = widthSize - 10.0f - txtStyleSize*2
         rect.top = ((heightSize)/2.0f) - (txtStyleSize)
         rect.bottom = ((heightSize)/2.0f) + (txtStyleSize)
 
-        canvas?.drawArc(rect,0f, progress.toFloat(), true, paint
+        canvas?.drawArc(rect,0f, progress.toFloat(), true, paint.apply { color = buttonCircleColor }
         )
 
     }
